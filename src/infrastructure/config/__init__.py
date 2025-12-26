@@ -4,7 +4,7 @@ from functools import cache
 from pathlib import Path
 
 from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict 
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ENV(Enum):
@@ -32,13 +32,23 @@ def get_env_file() -> Path:
 
 
 class _DBSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="db_", env_file=get_env_file(), extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="db_", env_file=get_env_file(), extra="ignore"
+    )
 
     host: str
     port: int = 5432
     database_name: str = "llm_economy_summary"
     user: str = "dev_user"
     password: str
+
+    def url(self) -> str:
+        """Generate async PostgreSQL URL."""
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.database_name}"
+
+    def sync_url(self) -> str:
+        """Generate sync PostgreSQL URL for Alembic."""
+        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database_name}"
 
 
 class Settings(BaseSettings):
@@ -64,4 +74,3 @@ class Settings(BaseSettings):
 
 
 confisettings = Settings()
-

@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRouter
 from contextlib import asynccontextmanager
 
-from infrastructure.config import settings
-from user_interface.restapi.router.summary import summary_router
+from src.infrastructure.config import confisettings
+from src.user_interface.restapi.router.summary import summary_router
 
 
 @asynccontextmanager
@@ -16,7 +16,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-if settings.is_local:
+if confisettings.is_local:
     from starlette.middleware.cors import CORSMiddleware
 
     app.add_middleware(
@@ -27,6 +27,6 @@ if settings.is_local:
         allow_headers=["*"],
     )
 
-root_router = APIRouter(prefix="/")
+root_router = APIRouter(prefix="/v1")
 root_router.include_router(summary_router)
-app.include_router(root_router) # type: ignore
+app.include_router(root_router)  # type: ignore

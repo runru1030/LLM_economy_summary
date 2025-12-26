@@ -1,0 +1,20 @@
+from src.application.service.summary import CreateSummaryData, SummaryService
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.domain.entity import Summary
+
+from src.application.usecase.base import BaseUseCase
+
+
+class SummaryUsecase(BaseUseCase):
+    def __init__(
+        self,
+        session: AsyncSession,
+    ):
+        super().__init__(session)
+        self._summary_service = SummaryService(session)
+
+    async def create_list(
+        self,
+        summary_list_create_data: list[CreateSummaryData],
+    ) -> list[Summary]:
+        return await self._summary_service.create_list(summary_list_create_data)

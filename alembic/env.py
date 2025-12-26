@@ -12,7 +12,7 @@ sys.path.insert(0, str(project_root))
 # Import your models and Base (after path modification)
 from src.infrastructure.config import confisettings  # noqa: E402
 from src.infrastructure.database.dao.base import Base  # noqa: E402
-from src.infrastructure.database.dao.summary import Summary  # noqa: F401, E402
+from src.infrastructure.database.dao.summary import SummaryDao  # noqa: F401, E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

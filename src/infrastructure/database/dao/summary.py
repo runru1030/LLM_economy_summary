@@ -14,7 +14,9 @@ class SummaryDao(Base):
 
     id: Mapped[int] = mapped_column("summary_id", primary_key=True)
     content: Mapped[str] = mapped_column("content", String(500), nullable=False)
-    keyword: Mapped[list[str]] = mapped_column("keyword", ARRAY(String), nullable=True)
+    keywords: Mapped[list[str]] = mapped_column(
+        "keywords", ARRAY(String), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         "created_at",
         UTCTimestamp,

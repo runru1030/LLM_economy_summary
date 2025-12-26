@@ -7,7 +7,7 @@ from src.infrastructure.repository.summary import SummaryRepository
 
 class CreateSummaryData(BaseModel):
     content: str = Field(max_length=500, default="")
-    keyword: list[str]
+    keywords: list[str]
 
 
 class SummaryService:
@@ -22,7 +22,7 @@ class SummaryService:
     ) -> list[Summary]:
         return await self._summary_repo.bulk(
             [
-                Summary(content=summary.content, keyword=summary.keyword)
+                Summary(content=summary.content, keywords=summary.keywords)
                 for summary in summary_list_data
             ]
         )

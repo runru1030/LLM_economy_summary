@@ -7,7 +7,6 @@ from src.application.usecase.summary import SummaryUsecase
 from src.application.query.summary import SummaryQuery
 from src.infrastructure.database import get_db
 from src.user_interface.restapi.dto.summary import (
-    SummaryGetResponse,
     SummaryGetResponseWithPagination,
     SummaryListCreateData,
 )

@@ -15,7 +15,7 @@ class SummaryMapper(BaseMapper):
 
     @staticmethod
     def dao_to_entity(dao: SummaryDao) -> Summary:
-        return Summary.model_validate(dao.model_dump())
+        return Summary.model_validate(dao)
 
 
 class SummaryRepository(IBaseRepository[Summary]):
@@ -34,17 +34,10 @@ class SummaryRepository(IBaseRepository[Summary]):
         ]
 
     async def find_deleted(self) -> list[Summary]:
-        query = select(SummaryDao).where(SummaryDao.deleted_at.isnot(None))
-        return [
-            SummaryMapper.dao_to_entity(x) for x in await self.session.scalars(query)
-        ]
+        pass
 
     async def delete_by(self, **kwargs) -> None:
         raise NotImplementedError
-
-    async def delete_by_ids(self, project_ids: list[int]) -> None:
-        query = delete(SummaryDao).where(SummaryDao.project_id.in_(project_ids))
-        await self.session.execute(query)
 
     async def partial_update_by(self, update_data: dict, **kwargs) -> None:
         query = self.combine_where(

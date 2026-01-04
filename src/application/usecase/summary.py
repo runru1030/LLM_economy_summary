@@ -1,6 +1,5 @@
 from src.application.service.summary import CreateSummaryData, SummaryService
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.domain.entity import Summary
 
 from src.application.usecase.base import BaseUseCase
 
@@ -16,5 +15,5 @@ class SummaryUsecase(BaseUseCase):
     async def create_list(
         self,
         summary_list_create_data: list[CreateSummaryData],
-    ) -> list[Summary]:
+    ) -> None:
         return await self._summary_service.create_list(summary_list_create_data)

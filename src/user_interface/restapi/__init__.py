@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from src.infrastructure.config import confisettings
 from src.user_interface.restapi.router.summary import summary_router
+from src.user_interface.restapi.router.healthz import healthz_router
 
 
 @asynccontextmanager
@@ -30,3 +31,4 @@ if confisettings.is_local:
 root_router = APIRouter(prefix="/v1")
 root_router.include_router(summary_router)
 app.include_router(root_router)  # type: ignore
+app.include_router(healthz_router)

@@ -7,5 +7,8 @@ class Summary(BaseModel):
 
     id: int | None = None
     content: str
+    title: str
     keywords: list[str]
+    author: str
+    published_at: datetime = Field(default_factory=lambda: datetime.now(tz=UTC))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=UTC))

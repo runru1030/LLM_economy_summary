@@ -1,13 +1,17 @@
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import UTC, datetime
 
 from src.domain.entity import Summary
 from src.infrastructure.repository.summary import SummaryRepository
 
 
 class CreateSummaryData(BaseModel):
+    title: str = Field(max_length=200, default="")
+    author: str = Field(default="")
     content: str = Field(max_length=500, default="")
     keywords: list[str]
+    published_at: str
 
 
 class SummaryService:
@@ -22,7 +26,15 @@ class SummaryService:
     ) -> list[Summary]:
         return await self._summary_repo.bulk(
             [
-                Summary(content=summary.content, keywords=summary.keywords)
+                Summary(
+                    title=summary.title,
+                    author=summary.author,
+                    content=summary.content,
+                    keywords=summary.keywords,
+                    published_at=datetime.strptime(
+                        summary.published_at, "%a, %d %b %Y %H:%M:%S %z"
+                    ).astimezone(UTC),
+                )
                 for summary in summary_list_data
             ]
         )

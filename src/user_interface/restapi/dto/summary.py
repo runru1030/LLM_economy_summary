@@ -6,8 +6,11 @@ from src.user_interface.restapi.dto.pagination import PaginationDto
 
 class SummaryGetResponse(BaseModel):
     id: int
+    title: str
     content: str
     keywords: list[str]
+    author: str
+    published_at: datetime
     created_at: datetime
 
 

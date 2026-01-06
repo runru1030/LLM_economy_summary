@@ -18,7 +18,7 @@ jobs:
       ECS_CLUSTER_NAME: dev # 배포하고자 하는 cluster 명
       ECS_CONTAINER_NAME: fastapi # ecs -> 태스크정의 내의 컨테이너 이름
       ECS_SERVICE_NAME: llm-economy-service # ecs에서 사용하는 서비스명
-      TASK_DEFINITION_NAME: llm-economy-test # ecs -> 태스크 정의 명
+      TASK_DEFINITION_NAME: llm-economy-task # ecs -> 태스크 정의 명
     outputs:
       imageRepository: ${{ steps.image.outputs.repository }}
       imageTag: ${{ steps.tag.outputs.tag }}

@@ -10,6 +10,7 @@ class SummaryGetResponse(BaseModel):
     content: str
     keywords: list[str]
     author: str
+    url:str
     published_at: datetime
     created_at: datetime
 

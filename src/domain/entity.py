@@ -10,5 +10,6 @@ class Summary(BaseModel):
     title: str
     keywords: list[str]
     author: str
+    url:str
     published_at: datetime = Field(default_factory=lambda: datetime.now(tz=UTC))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=UTC))

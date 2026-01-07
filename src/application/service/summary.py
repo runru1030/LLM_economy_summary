@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from sqlalchemy.engine import url
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import UTC, datetime
 
@@ -9,6 +10,7 @@ from src.infrastructure.repository.summary import SummaryRepository
 class CreateSummaryData(BaseModel):
     title: str = Field(max_length=200, default="")
     author: str = Field(default="")
+    url: str = Field(default="")
     content: str = Field(max_length=500, default="")
     keywords: list[str]
     published_at: str
@@ -29,6 +31,7 @@ class SummaryService:
                 Summary(
                     title=summary.title,
                     author=summary.author,
+                    url=summary.url,
                     content=summary.content,
                     keywords=summary.keywords,
                     published_at=datetime.strptime(

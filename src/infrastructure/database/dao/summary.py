@@ -19,6 +19,7 @@ class SummaryDao(Base):
         "keywords", ARRAY(String), nullable=True
     )
     author: Mapped[str] = mapped_column("author", String(200), nullable=False)
+    url: Mapped[str] = mapped_column("url", nullable=True)
     published_at: Mapped[datetime] = mapped_column(
         "published_at",
         UTCTimestamp,

@@ -15,21 +15,15 @@ class SummaryQuery:
         limit: int,
         asc: bool,
     ):
-        base_query = (
-            select(SummaryDao)
-            .distinct(SummaryDao.url)
-            .order_by(
-                SummaryDao.url,
-                SummaryDao.published_at.asc()
-                if asc
-                else SummaryDao.published_at.desc(),
-            )
-        )
+        base_query = select(SummaryDao)
         total_count: int | None = await session.scalar(
             select(func.count()).select_from(base_query)
         )
+        query = select(SummaryDao).order_by(
+            SummaryDao.published_at.asc() if asc else SummaryDao.published_at.desc(),
+        )
 
-        rows = (await session.execute(base_query)).unique().all()[offset : offset + limit]
+        rows = (await session.execute(query)).unique().all()[offset : offset + limit]
         result: dict[str, int | bool | list] = {
             "total": total_count if total_count else 0,
             "offset": offset,

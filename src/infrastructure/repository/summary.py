@@ -6,6 +6,7 @@ from src.infrastructure.repository.base import BaseMapper
 from src.infrastructure.database.dao import (
     SummaryDao,
 )
+from sqlalchemy.dialects.postgresql import insert
 
 
 class SummaryMapper(BaseMapper):
@@ -58,8 +59,10 @@ class SummaryRepository(IBaseRepository[Summary]):
         return SummaryMapper.dao_to_entity(project_dao)
 
     async def bulk(self, entities: list[Summary]) -> None:
-        daos = [SummaryMapper.entity_to_dao(entity) for entity in entities]
-        self.session.add_all(daos)
+        values = [SummaryMapper.entity_to_dao(entity) for entity in entities]
+        stmt = insert(SummaryDao).values(values)
+        stmt = stmt.on_conflict_do_nothing(index_elements=["url"])
+        self.session.execute(stmt)
 
     async def update(self, entity: Summary):
         summary_dao = SummaryMapper.entity_to_dao(entity)

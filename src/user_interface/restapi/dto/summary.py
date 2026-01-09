@@ -1,7 +1,13 @@
 from datetime import datetime
+from enum import StrEnum
 from pydantic import BaseModel
 from src.application.service.summary import CreateSummaryData
 from src.user_interface.restapi.dto.pagination import PaginationDto
+
+
+class OrderBy(StrEnum):
+    published_at = "published_at"
+    created_at = "created_at"
 
 
 class SummaryGetResponse(BaseModel):

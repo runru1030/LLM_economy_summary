@@ -2,15 +2,13 @@ from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from src.infrastructure.config import confisettings
+from infrastructure.config import confisettings
 
 
 class Database:
     def __init__(self, url: str):
         self.engine = create_async_engine(url)
-        self.sessionmaker = async_sessionmaker(
-            autocommit=False, expire_on_commit=False, bind=self.engine
-        )
+        self.sessionmaker = async_sessionmaker(autocommit=False, expire_on_commit=False, bind=self.engine)
 
 
 database = Database(confisettings.db.url())

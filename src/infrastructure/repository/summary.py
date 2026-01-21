@@ -1,12 +1,13 @@
 from sqlalchemy import delete, select, update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.domain.base.repository import IBaseRepository
-from src.domain.entity import Summary
-from src.infrastructure.repository.base import BaseMapper
-from src.infrastructure.database.dao import (
+
+from domain.base.repository import IBaseRepository
+from domain.entity import Summary
+from infrastructure.database.dao import (
     SummaryDao,
 )
-from sqlalchemy.dialects.postgresql import insert
+from infrastructure.repository.base import BaseMapper
 
 
 class SummaryMapper(BaseMapper):
@@ -29,10 +30,7 @@ class SummaryRepository(IBaseRepository[Summary]):
             select(SummaryDao),
             kwargs,
         )
-        return [
-            SummaryMapper.dao_to_entity(x)
-            for x in (await self.session.scalars(query)).unique()
-        ]
+        return [SummaryMapper.dao_to_entity(x) for x in (await self.session.scalars(query)).unique()]
 
     async def find_deleted(self) -> list[Summary]:
         pass
@@ -41,9 +39,7 @@ class SummaryRepository(IBaseRepository[Summary]):
         raise NotImplementedError
 
     async def partial_update_by(self, update_data: dict, **kwargs) -> None:
-        query = self.combine_where(
-            SummaryDao, update(SummaryDao).values(update_data), kwargs
-        )
+        query = self.combine_where(SummaryDao, update(SummaryDao).values(update_data), kwargs)
         await self.session.execute(query)
 
     async def find_by_id(self, summary_id: int) -> Summary:
@@ -61,22 +57,14 @@ class SummaryRepository(IBaseRepository[Summary]):
     async def bulk(self, entities: list[Summary]) -> None:
         values = [e.model_dump(exclude="id") for e in entities]
 
-        stmt = (
-            insert(SummaryDao)
-            .values(values)
-            .on_conflict_do_nothing(index_elements=["url"])
-        )
+        stmt = insert(SummaryDao).values(values).on_conflict_do_nothing(index_elements=["url"])
 
         await self.session.execute(stmt)
         await self.session.commit()
 
     async def update(self, entity: Summary):
         summary_dao = SummaryMapper.entity_to_dao(entity)
-        query = (
-            update(SummaryDao)
-            .values(summary_dao)
-            .where(SummaryDao.id == summary_dao.id)
-        )
+        query = update(SummaryDao).values(summary_dao).where(SummaryDao.id == summary_dao.id)
         await self.session.execute(query)
 
     async def delete(self, entity: Summary):

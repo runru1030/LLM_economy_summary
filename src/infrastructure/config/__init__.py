@@ -32,9 +32,7 @@ def get_env_file() -> Path:
 
 
 class _DBSettings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix="db_", env_file=get_env_file(), extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_prefix="db_", env_file=get_env_file(), extra="ignore")
 
     host: str
     port: int = 5432

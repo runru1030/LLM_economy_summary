@@ -1,17 +1,18 @@
 import typing
+
 from fastapi import Depends, Query
 from fastapi.routing import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
-from src.application.usecase.summary import SummaryUsecase
-from src.application.query.summary import SummaryQuery
-from src.infrastructure.database import get_db
-from src.user_interface.restapi.dto.summary import (
+from application.query.summary import SummaryQuery
+from application.usecase.summary import SummaryUsecase
+from infrastructure.database import get_db
+from user_interface.restapi.dto.summary import (
     OrderBy,
     SummaryGetResponseWithPagination,
     SummaryListCreateData,
 )
-from starlette import status
 
 summary_router = APIRouter(
     prefix="/summary",
@@ -31,9 +32,7 @@ async def get_summary_list(
     order_by: OrderBy = Query(OrderBy.published_at, description="정렬 대상"),
     asc: bool = Query(False, description="오름차순 정렬 여부"),
 ):
-    return await SummaryQuery.get_list(
-        session, offset=offset, limit=limit, _asc=asc, order_by=order_by
-    )
+    return await SummaryQuery.get_list(session, offset=offset, limit=limit, _asc=asc, order_by=order_by)
 
 
 @summary_router.post("", status_code=status.HTTP_201_CREATED, response_model=None)

@@ -1,11 +1,16 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRouter
-from contextlib import asynccontextmanager
+from fastapi.middleware import Middleware
 
-from src.infrastructure.config import confisettings
-from src.user_interface.restapi.router.summary import summary_router
-from src.user_interface.restapi.router.healthz import healthz_router
+from infrastructure.config import confisettings
+from user_interface.restapi.router.healthz import healthz_router
+from user_interface.restapi.router.summary import summary_router
+from user_interface.restapi.router.economy_agent import economy_agent_router
+from user_interface.restapi.middlewares.header_parser import HeaderParserMiddleware
+from user_interface.restapi.middlewares.logger import LoggingMiddleware
 
 
 @asynccontextmanager
@@ -15,6 +20,10 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
+    middleware=[
+        Middleware(HeaderParserMiddleware),
+        Middleware(LoggingMiddleware),
+    ],
 )
 
 if confisettings.is_local:
@@ -30,5 +39,6 @@ if confisettings.is_local:
 
 root_router = APIRouter(prefix="/v1")
 root_router.include_router(summary_router)
+root_router.include_router(economy_agent_router)
 app.include_router(root_router)  # type: ignore
 app.include_router(healthz_router)

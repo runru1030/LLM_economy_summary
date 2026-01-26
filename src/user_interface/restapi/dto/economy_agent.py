@@ -14,7 +14,7 @@ class TextMessage(BaseModel):
 
 
 class ThreadRequest(BaseModel):
-    thread_id: uuid.UUID | None = Field(
+    thread_id: str | None = Field(
         None,
         description="메시지를 전송할 채팅방 ID입니다. 없으면 새로운 채팅방을 생성합니다.",
     )
@@ -35,6 +35,7 @@ class ThreadResponse(BaseModel):
         "amc",
         "tm",
         "thread_start",
+        "thread_end",
         "thread_error",
         "tool_start",
     ]

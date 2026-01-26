@@ -47,14 +47,13 @@ async def chat(
         body=body,
     )
 
-
 @economy_agent_router.post(
     "/chat/{thread_id}/replay",
     description="실시간 대화",
     response_model=ThreadResponse,
 )
 async def replay_thread(
-    thread_id: uuid.UUID,
+    thread_id: str,
     user_id: UserIDDeps,
     body: ReplayAnswerRequest,
     workflow: LangGraphWorkflowDeps,

@@ -19,7 +19,7 @@ class SingleAgentWorkflowFactory:
     def __init__(
         self,
         *,
-        model_id: ModelID = ModelID.OPENAI_GPT_41_MINI,
+        model_id: ModelID = ModelID.OPENAI_GPT_5_MINI,
     ):
         self.model_id = model_id
 

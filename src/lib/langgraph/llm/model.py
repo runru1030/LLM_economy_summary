@@ -33,6 +33,7 @@ class CustomFakeListChatModel(FakeListChatModel):
 
 
 class ModelID(StrEnum):
+    OPENAI_GPT_5_MINI = "gpt-5-mini"
     OPENAI_GPT_41_MINI = "gpt-4.1-mini"
     FAKE = "fake"
 
@@ -40,6 +41,12 @@ class ModelID(StrEnum):
 @cache
 def get_model(model_id: ModelID, temperature: float = 0.5) -> BaseChatModel:
     match model_id:
+        case ModelID.OPENAI_GPT_5_MINI:
+            return ChatOpenAI(
+                model_name=model_id,
+                openai_api_key=os.getenv("OPENAI_API_KEY"),
+                temperature=temperature,
+            )
         case ModelID.OPENAI_GPT_41_MINI:
             return ChatOpenAI(
                 model_name=model_id,

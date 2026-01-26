@@ -12,6 +12,7 @@ from user_interface.restapi.dto.economy_agent import (
 from lib.langgraph.runtime.streamer import stream_worker
 from lib.langgraph.graph.workflow.base import LangGraphWorkflow
 from lib.langgraph.graph.workflow.factory import SingleAgentWorkflowFactory
+from langchain_core.output_parsers import StrOutputParser
 
 
 class AgentManager:
@@ -23,6 +24,7 @@ class AgentManager:
         self.workflow: LangGraphWorkflow = SingleAgentWorkflowFactory().build(
             user_id=user_id,
         )
+        self._message_parser = StrOutputParser()
 
     # ------------------------------------------------------------
     # New conversation
@@ -49,6 +51,7 @@ class AgentManager:
                 thread_id=thread_id,
                 messages=[m.model_dump() for m in body.messages],
                 send=send,
+                message_parser=self._message_parser,
             )
             # finally:
             # self.locks.release(thread_id)
@@ -87,6 +90,7 @@ class AgentManager:
                     messages=[{"type": "text", "text": last_text}],
                     send=send,
                     replay=True,
+                    message_parser=self._message_parser,
                 )
 
             return EventSourceResponse(

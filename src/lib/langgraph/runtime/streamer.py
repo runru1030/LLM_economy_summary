@@ -8,7 +8,7 @@ from lib.langgraph.graph.workflow.base import StreamData
 from lib.langgraph.graph.workflow.base import LangGraphWorkflow
 
 from langchain_core.messages import HumanMessage
-from langchain_core.runnables import RunnableConfig
+from langchain_core.output_parsers import StrOutputParser
 
 
 def _to_json(data: StreamData) -> str:
@@ -20,7 +20,9 @@ async def stream_worker(
     thread_id: str,
     messages: list[dict[str, Any]],
     send: MemoryObjectSendStream,
+    message_parser: StrOutputParser
 ):
+    thread_ended = False
     await send.send(
         _to_json(
             {
@@ -40,32 +42,36 @@ async def stream_worker(
                     case "on_chat_model_stream":
                         chunk = event["data"].get("chunk")
                         if chunk and chunk.content:
+                            msg = message_parser.invoke(chunk)
                             await send.send(
                                 _to_json(
                                     {
                                         "id": event["run_id"],
-                                        "type": "assistant_chunk",
-                                        "data": chunk.content,
+                                        "type": "amc",
+                                        "data": msg,
                                     }
                                 )
                             )
 
                     case "on_chain_end":
-                        await send.send(
-                            _to_json(
-                                {
-                                    "id": str(uuid.uuid4()),
-                                    "type": "conversation_end",
-                                    "data": {"thread_id": thread_id},
-                                }
+                        if not thread_ended:
+                            thread_ended = True
+                            await send.send(
+                                _to_json(
+                                    {
+                                        "id": str(uuid.uuid4()),
+                                        "type": "thread_end",
+                                        "data": {"thread_id": thread_id},
+                                    }
+                                )
                             )
-                        )
+                            break
         except Exception as e:
             await send.send(
                 _to_json(
                     {
                         "id": str(uuid.uuid4()),
-                        "type": "conversation_error",
+                        "type": "thread_error",
                         "data": {"error": str(e)},
                     }
                 )

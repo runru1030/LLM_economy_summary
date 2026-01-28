@@ -1,10 +1,11 @@
+from datetime import UTC, datetime
+
 from pydantic import BaseModel, Field
 from sqlalchemy.engine import url
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import UTC, datetime
 
-from src.domain.entity import Summary
-from src.infrastructure.repository.summary import SummaryRepository
+from domain.entity import Summary
+from infrastructure.repository.summary import SummaryRepository
 
 
 class CreateSummaryData(BaseModel):
@@ -34,9 +35,7 @@ class SummaryService:
                     url=summary.url,
                     content=summary.content,
                     keywords=summary.keywords,
-                    published_at=datetime.strptime(
-                        summary.published_at, "%a, %d %b %Y %H:%M:%S %z"
-                    ).astimezone(UTC),
+                    published_at=datetime.strptime(summary.published_at, "%a, %d %b %Y %H:%M:%S %z").astimezone(UTC),
                 )
                 for summary in summary_list_data
             ]

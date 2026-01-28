@@ -1,7 +1,7 @@
-from src.application.service.summary import CreateSummaryData, SummaryService
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.usecase.base import BaseUseCase
+from application.service.summary import CreateSummaryData, SummaryService
+from application.usecase.base import BaseUseCase
 
 
 class SummaryUsecase(BaseUseCase):

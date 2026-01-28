@@ -1,8 +1,10 @@
 from datetime import datetime
 from enum import StrEnum
+
 from pydantic import BaseModel
-from src.application.service.summary import CreateSummaryData
-from src.user_interface.restapi.dto.pagination import PaginationDto
+
+from application.service.summary import CreateSummaryData
+from user_interface.restapi.dto.pagination import PaginationDto
 
 
 class OrderBy(StrEnum):

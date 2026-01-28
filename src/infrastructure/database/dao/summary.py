@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from sqlalchemy import (
     ARRAY,
     String,
@@ -7,21 +8,17 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.infrastructure.database.dao.base import Base, UTCTimestamp
+from infrastructure.database.dao.base import Base, UTCTimestamp
 
 
 class SummaryDao(Base):
     __tablename__ = "summary"
-    __table_args__ = (
-        UniqueConstraint("url", name="uq_news_url"),
-    )
+    __table_args__ = (UniqueConstraint("url", name="uq_news_url"),)
 
     id: Mapped[int] = mapped_column("summary_id", primary_key=True)
     title: Mapped[str] = mapped_column("title", String(200), nullable=False)
     content: Mapped[str] = mapped_column("content", String(500), nullable=False)
-    keywords: Mapped[list[str]] = mapped_column(
-        "keywords", ARRAY(String), nullable=True
-    )
+    keywords: Mapped[list[str]] = mapped_column("keywords", ARRAY(String), nullable=True)
     author: Mapped[str] = mapped_column("author", String(200), nullable=False)
     url: Mapped[str] = mapped_column("url", nullable=True, unique=True)
     published_at: Mapped[datetime] = mapped_column(

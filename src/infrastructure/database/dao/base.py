@@ -1,4 +1,5 @@
 from datetime import UTC
+
 from sqlalchemy import TIMESTAMP, TypeDecorator
 from sqlalchemy.orm import DeclarativeBase
 

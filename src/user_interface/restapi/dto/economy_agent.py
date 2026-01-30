@@ -41,3 +41,13 @@ class ThreadResponse(BaseModel):
     ]
     data: str | list | dict
 
+
+class ThreadMessage(BaseModel):
+    id: str
+    role: str  # user | assistant | tool
+    content: list[TextMessage]
+
+
+class ThreadHistoryResponse(BaseModel):
+    thread_id: uuid.UUID
+    messages: list[ThreadMessage]

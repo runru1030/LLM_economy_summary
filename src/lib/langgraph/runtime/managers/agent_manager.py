@@ -98,3 +98,21 @@ class AgentManager:
 
         except Exception:
             raise
+
+    async def get_history(self, thread_id: str, user_id: str):
+        # TODO user_id 활용
+        messages = await self.workflow.get_messages(str(thread_id))
+
+        result = []
+        for message in messages:
+            data = message.get("data", [{}])
+            if isinstance(data, list) and len(data) > 0:
+                if data[0].get("text") == "Briefly summarize the core contents of the files.":
+                    continue
+
+            result.append(message)
+
+        return {
+            "thread_id": str(thread_id),
+            "messages": result,
+        }

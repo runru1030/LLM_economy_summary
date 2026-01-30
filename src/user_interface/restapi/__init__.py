@@ -1,21 +1,32 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRouter
-from fastapi.middleware import Middleware
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.store.memory import InMemoryStore
+from langgraph.store.postgres.aio import AsyncPostgresStore
 
 from infrastructure.config import confisettings
-from user_interface.restapi.router.healthz import healthz_router
-from user_interface.restapi.router.summary import summary_router
-from user_interface.restapi.router.economy_agent import economy_agent_router
 from user_interface.restapi.middlewares.header_parser import HeaderParserMiddleware
 from user_interface.restapi.middlewares.logger import LoggingMiddleware
+from user_interface.restapi.router.economy_agent import economy_agent_router
+from user_interface.restapi.router.healthz import healthz_router
+from user_interface.restapi.router.summary import summary_router
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    yield
+    saver: MemorySaver | AsyncPostgresSaver
+    store: InMemoryStore | AsyncPostgresStore
+    if confisettings.is_local:
+        saver = MemorySaver()
+        store = InMemoryStore()
+        _app.saver = saver
+        _app.store = store
+        yield
 
 
 app = FastAPI(

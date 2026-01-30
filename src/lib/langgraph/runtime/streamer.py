@@ -3,16 +3,15 @@ from typing import Any
 
 import orjson
 from anyio.streams.memory import MemoryObjectSendStream
-
-from lib.langgraph.graph.workflow.base import StreamData
-from lib.langgraph.graph.workflow.base import LangGraphWorkflow
-
 from langchain_core.messages import HumanMessage
 from langchain_core.output_parsers import StrOutputParser
+
+from lib.langgraph.graph.workflow.base import LangGraphWorkflow, StreamData
 
 
 def _to_json(data: StreamData) -> str:
     return orjson.dumps(data).decode()
+
 
 async def stream_worker(
     *,
@@ -20,9 +19,8 @@ async def stream_worker(
     thread_id: str,
     messages: list[dict[str, Any]],
     send: MemoryObjectSendStream,
-    message_parser: StrOutputParser
+    message_parser: StrOutputParser,
 ):
-    thread_ended = False
     await send.send(
         _to_json(
             {
@@ -54,18 +52,15 @@ async def stream_worker(
                             )
 
                     case "on_chain_end":
-                        if not thread_ended:
-                            thread_ended = True
-                            await send.send(
-                                _to_json(
-                                    {
-                                        "id": str(uuid.uuid4()),
-                                        "type": "thread_end",
-                                        "data": {"thread_id": thread_id},
-                                    }
-                                )
+                        await send.send(
+                            _to_json(
+                                {
+                                    "id": str(uuid.uuid4()),
+                                    "type": "thread_end",
+                                    "data": {"thread_id": thread_id},
+                                }
                             )
-                            break
+                        )
         except Exception as e:
             await send.send(
                 _to_json(

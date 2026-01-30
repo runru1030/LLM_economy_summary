@@ -1,6 +1,7 @@
-from typing import TypedDict, NotRequired
+from typing import Annotated, NotRequired, TypedDict
 
 from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
 
 
 class State(TypedDict):
@@ -12,8 +13,7 @@ class State(TypedDict):
     """
 
     # 대화 메시지 (필수)
-    messages: list[BaseMessage]
-
+    messages: Annotated[list[BaseMessage], add_messages]
     # ---- RAG 확장용 (지금은 사용 안 함) ----
     retrieved_docs: NotRequired[list[str]]
     need_retrieve: NotRequired[bool]

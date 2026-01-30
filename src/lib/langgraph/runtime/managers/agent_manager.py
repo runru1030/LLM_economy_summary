@@ -1,29 +1,26 @@
 from uuid import uuid4
 
 from anyio import create_memory_object_stream
+from langchain_core.output_parsers import StrOutputParser
 from sse_starlette import EventSourceResponse
 
-from user_interface.restapi.dto.economy_agent import (
-    ThreadRequest,
-    ReplayAnswerRequest,
-    TextMessage,
-)
-
-from lib.langgraph.runtime.streamer import stream_worker
 from lib.langgraph.graph.workflow.base import LangGraphWorkflow
 from lib.langgraph.graph.workflow.factory import SingleAgentWorkflowFactory
-from langchain_core.output_parsers import StrOutputParser
+from lib.langgraph.runtime.streamer import stream_worker
+from user_interface.restapi.dto.economy_agent import (
+    ReplayAnswerRequest,
+    TextMessage,
+    ThreadRequest,
+)
 
 
 class AgentManager:
     def __init__(
         self,
         *,
-        user_id: str,
+        workflow: LangGraphWorkflow,
     ):
-        self.workflow: LangGraphWorkflow = SingleAgentWorkflowFactory().build(
-            user_id=user_id,
-        )
+        self.workflow = workflow
         self._message_parser = StrOutputParser()
 
     # ------------------------------------------------------------

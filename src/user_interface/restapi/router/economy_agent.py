@@ -2,7 +2,7 @@ import uuid
 
 from fastapi import APIRouter
 
-from lib.langgraph.runtime.managers.agent_manager import AgentManager
+from application.usecase.agent_manager import AgentManager
 from user_interface.restapi.dependency.economy_agent import SingleAgentWorkflowDeps, UserIDDeps
 from user_interface.restapi.dto.economy_agent import (
     ReplayAnswerRequest,

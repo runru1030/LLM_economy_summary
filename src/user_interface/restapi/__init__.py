@@ -28,7 +28,7 @@ if confisettings.is_local:
         allow_headers=["*"],
     )
 
-root_router = APIRouter(prefix="/v1")
+root_router = APIRouter(prefix="/api/v1")
 root_router.include_router(summary_router)
 app.include_router(root_router)  # type: ignore
 app.include_router(healthz_router)

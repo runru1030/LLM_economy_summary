@@ -15,10 +15,10 @@ jobs:
     name: CD
     runs-on: ubuntu-latest
     env:
-      ECS_CLUSTER_NAME: dev # 배포하고자 하는 cluster 명
-      ECS_CONTAINER_NAME: fastapi # ecs -> 태스크정의 내의 컨테이너 이름
-      ECS_SERVICE_NAME: llm-economy-service # ecs에서 사용하는 서비스명
-      TASK_DEFINITION_NAME: llm-economy-task # ecs -> 태스크 정의 명
+      AZURE_CONTAINERAPP_NAME: llm-economy-backend-dev 
+      AZURE_RESOURCE_GROUP: llm-economy
+      ACR_REGISTRY_NAME: devllmeconomy
+      CONTAINER_NAME: llm-economy-backend-dev 
     outputs:
       imageRepository: ${{ steps.image.outputs.repository }}
       imageTag: ${{ steps.tag.outputs.tag }}
@@ -29,17 +29,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Azure Login
+        uses: azure/login@v2
         with:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          aws-region: us-west-2
-          mask-aws-account-id: no
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR_REGISTRY_NAME }}.azurecr.io
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       - name: Set tag
         id: tag
@@ -51,9 +51,9 @@ jobs:
       - name: Set image.repository
         id: image
         run: |
-          echo "repository=${{ steps.login-ecr.outputs.registry }}/llm-economy/backend" >> $GITHUB_OUTPUT
+          echo "repository=${{ env.ACR_REGISTRY_NAME }}.azurecr.io/llm-economy-summary" >> $GITHUB_OUTPUT
 
-      - name: Build and push image to Amazon ECR
+      - name: Build and push image to Azure ACR
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -62,25 +62,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Download Task Definition Template
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition ${{ env.TASK_DEFINITION_NAME }} \
-            --query taskDefinition \
-            > task-definition.json
-
-      - name: Render ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+      - name: Deploy to Azure Container Apps
+        uses: azure/CLI@v2
         with:
-          task-definition: task-definition.json
-          container-name: ${{ env.ECS_CONTAINER_NAME }}
-          image: ${{ steps.image.outputs.repository }}:${{ steps.tag.outputs.tag }}
-
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE_NAME }}
-          cluster: ${{ env.ECS_CLUSTER_NAME }}
-          wait-for-service-stability: true
+          inlineScript: |
+            az containerapp update \
+              --name ${{ env.AZURE_CONTAINERAPP_NAME }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --container-name ${{ env.CONTAINER_NAME }} \
+              --image ${{ steps.image.outputs.repository }}:${{ steps.tag.outputs.tag }}

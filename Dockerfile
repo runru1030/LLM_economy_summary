@@ -19,6 +19,7 @@ FROM python:3.12-slim-bookworm
 WORKDIR /app
 
 ENV VIRTUAL_ENV=/app/.venv \
+    PYTHONPATH=/app/src \
     PATH="/app/.venv/bin:$PATH"
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
@@ -27,4 +28,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["uvicorn", "src.user_interface.restapi:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--no-use-colors", "--log-level", "warning"]
+CMD ["uvicorn", "user_interface.restapi:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--no-use-colors", "--log-level", "warning"]

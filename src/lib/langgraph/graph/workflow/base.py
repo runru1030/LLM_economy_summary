@@ -2,11 +2,12 @@ import logging
 from typing import Any, Literal
 
 from langchain_core.messages import BaseMessage, RemoveMessage
+from langchain_core.runnables import RunnableConfig
 from langfuse.langchain import CallbackHandler
 from langgraph.graph.state import CompiledStateGraph
 from typing_extensions import TypedDict
+
 from lib.langgraph.llm.model import ModelID
-from langchain_core.runnables import RunnableConfig
 
 logger = logging.getLogger(__name__)
 langfuse_handler = CallbackHandler()
@@ -48,7 +49,7 @@ class LangGraphWorkflow:
     - thread metadata 접근 (graph.store)
     """
 
-    def __init__(self, user_id: str, model_id: ModelID , graph: CompiledStateGraph):
+    def __init__(self, user_id: str, model_id: ModelID, graph: CompiledStateGraph):
         self.user_id = user_id
         self.model_id = model_id
         self.graph = graph
@@ -63,7 +64,12 @@ class LangGraphWorkflow:
 
     def _config(self, thread_id: ThreadID) -> dict:
         """LangGraph RunnableConfig용 최소 config"""
-        return {"configurable": {"thread_id": self._thread_key(thread_id),  "model_id": self.model_id,}}
+        return {
+            "configurable": {
+                "thread_id": self._thread_key(thread_id),
+                "model_id": self.model_id,
+            }
+        }
 
     # ------------------------------------------------------------------
     # Message APIs

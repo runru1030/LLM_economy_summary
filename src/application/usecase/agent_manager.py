@@ -1,29 +1,26 @@
 from uuid import uuid4
 
 from anyio import create_memory_object_stream
+from langchain_core.output_parsers import StrOutputParser
 from sse_starlette import EventSourceResponse
 
-from user_interface.restapi.dto.economy_agent import (
-    ThreadRequest,
-    ReplayAnswerRequest,
-    TextMessage,
-)
-
-from lib.langgraph.runtime.streamer import stream_worker
 from lib.langgraph.graph.workflow.base import LangGraphWorkflow
 from lib.langgraph.graph.workflow.factory import SingleAgentWorkflowFactory
-from langchain_core.output_parsers import StrOutputParser
+from lib.langgraph.runtime.streamer import stream_worker
+from user_interface.restapi.dto.economy_agent import (
+    ReplayAnswerRequest,
+    TextMessage,
+    ThreadRequest,
+)
 
 
 class AgentManager:
     def __init__(
         self,
         *,
-        user_id: str,
+        workflow: LangGraphWorkflow,
     ):
-        self.workflow: LangGraphWorkflow = SingleAgentWorkflowFactory().build(
-            user_id=user_id,
-        )
+        self.workflow = workflow
         self._message_parser = StrOutputParser()
 
     # ------------------------------------------------------------
@@ -101,3 +98,21 @@ class AgentManager:
 
         except Exception:
             raise
+
+    async def get_history(self, thread_id: str, user_id: str):
+        # TODO user_id 활용
+        messages = await self.workflow.get_messages(str(thread_id))
+
+        result = []
+        for message in messages:
+            data = message.get("data", [{}])
+            if isinstance(data, list) and len(data) > 0:
+                if data[0].get("text") == "Briefly summarize the core contents of the files.":
+                    continue
+
+            result.append(message)
+
+        return {
+            "thread_id": str(thread_id),
+            "messages": result,
+        }

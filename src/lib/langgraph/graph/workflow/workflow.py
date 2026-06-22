@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.base import BaseCheckpointSaver
+from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.store.base import BaseStore
 
-from lib.langgraph.graph.state import State
 from lib.langgraph.graph.nodes.chat import chat_node
 from lib.langgraph.graph.nodes.decide import decide_retrieve
 from lib.langgraph.graph.nodes.retrieve import retrieve_node
-from lib.langgraph.llm.model import ModelID
+from lib.langgraph.graph.state import State
 
-def build_workflow() -> CompiledStateGraph:
+
+def build_workflow(checkpointer: BaseCheckpointSaver, store: BaseStore) -> CompiledStateGraph:
     """
     LangGraph Workflow Builder
 
@@ -40,4 +42,6 @@ def build_workflow() -> CompiledStateGraph:
 
     return graph.compile(
         name="single-agent-workflow",
+        checkpointer=checkpointer,
+        store=store,
     )

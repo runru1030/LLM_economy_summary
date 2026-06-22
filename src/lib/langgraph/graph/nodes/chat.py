@@ -22,6 +22,9 @@ async def chat_node(
 
     response = await llm.ainvoke(state["messages"])
 
+    if isinstance(response.content, str):
+        response.content = [{"type": "text", "text": response.content}]
+
     return {
-        "messages": state["messages"] + [response],
+        "messages": [response],
     }
